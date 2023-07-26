@@ -17,7 +17,7 @@ listener github:Listener gitHubListener = new (gitHubListenerConfig, httpListene
 service github:PullRequestService on gitHubListener {
     remote function onOpened(github:PullRequestEvent payload) returns error? {
 
-        string pullRequestID = payload.pull_request.number;
+        int pullRequestID = payload.pull_request.number;
         string reqBody = payload.pull_request.body ?: "";
         string reqUrl = payload.pull_request.url;
         string title = payload.pull_request.title;
