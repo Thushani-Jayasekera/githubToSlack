@@ -3,6 +3,7 @@ import ballerina/log;
 import ballerinax/trigger.github;
 import ballerinax/slack;
 
+// new line
 // Github configuration parameters
 configurable github:ListenerConfig gitHubListenerConfig = ?;
 
@@ -19,10 +20,10 @@ service github:PullRequestService on gitHubListener {
 
         int pullRequestID = payload.pull_request.number;
         string reqBody = payload.pull_request.body ?: "";
-        string reqUrl = payload.pull_request.url;
+        string reqUrl = payload.pull_request.html_url;
         string title = payload.pull_request.title;
 
-        string message = "There is a new pull request in GitHub ! \n <" + reqUrl+ ">\n";
+        string message = "There is a new pull request in GitHub ! \n <" + reqUrl+ ">\n title: "+ title;
 
 
         slack:Client slackClient = check new ({auth: {token: slackAuthToken}});
