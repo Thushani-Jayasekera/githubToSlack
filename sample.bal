@@ -3,18 +3,6 @@ import ballerina/log;
 import ballerinax/trigger.github;
 import ballerinax/slack;
 
-// Types
-type ReleaseInfo record {|
-    string 'key;
-    string value;
-|};
-
-// Constants
-const string RELEASE_TAG_NAME = "tag_name";
-const string TARGET_COMMITTISH = "target_commitish";
-const string VERSION_NUMBER = "Version Number";
-const string TARGET_BRANCH = "Target branch";
-
 // Github configuration parameters
 configurable github:ListenerConfig gitHubListenerConfig = ?;
 
@@ -25,28 +13,17 @@ configurable string slackChannelName = ?;
 listener http:Listener httpListener = new(8090);
 listener github:Listener gitHubListener = new (gitHubListenerConfig, httpListener);
 
-@display { label: "GitHub New Release to Slack Channel Message" }
-service github:ReleaseService on gitHubListener {
-    remote function onReleased(github:ReleaseEvent payload) returns error? {
-        github:Release releaseInfo = payload.release;
+@display { label: "GitHub New Pull request to Slack Channel Message" }
+service github:PullRequestService on gitHubListener {
+    remote function onOpened(github:PullRequestEvent payload) returns error? {
 
-        ReleaseInfo[] requiredFields = [
-            {
-                'key: VERSION_NUMBER,
-                value: RELEASE_TAG_NAME
-            },
-            {
-                'key: TARGET_BRANCH,
-                value: TARGET_COMMITTISH
-            }
-        ];
+        string pullRequestID = payload.pull_request.number;
+        string reqBody = payload.pull_request.body ?: "";
+        string reqUrl = payload.pull_request.url;
+        string title = payload.pull_request.title;
 
-        string message = "There is a new release in GitHub ! \n <" + releaseInfo.html_url + ">\n";
-        foreach ReleaseInfo {'key, value} in requiredFields {
-            if releaseInfo.hasKey(value) {
-                message += string `${'key} : ${releaseInfo.get(value).toString()}${"\n"}`;
-            }
-        }
+        string message = "There is a new pull request in GitHub ! \n <" + reqUrl+ ">\n";
+
 
         slack:Client slackClient = check new ({auth: {token: slackAuthToken}});
         string response = check slackClient->postMessage({
@@ -55,22 +32,31 @@ service github:ReleaseService on gitHubListener {
         });
         log:printInfo("Message sent successfully " + response.toString());
     }
-    remote function onPublished(github:ReleaseEvent payload) returns error? {
+    remote function onClosed(github:PullRequestEvent payload) returns error? {
         return;
     }
-    remote function onUnpublished(github:ReleaseEvent payload) returns error? {
+    remote function onReopened(github:PullRequestEvent payload) returns error? {
         return;
     }
-    remote function onCreated(github:ReleaseEvent payload) returns error? {
+    remote function onAssigned(github:PullRequestEvent payload) returns error? {
         return;
     }
-    remote function onEdited(github:ReleaseEvent payload) returns error? {
+    remote function onUnassigned(github:PullRequestEvent payload) returns error? {
         return;
     }
-    remote function onDeleted(github:ReleaseEvent payload) returns error? {
+    remote function onReviewRequested(github:PullRequestEvent payload) returns error? {
         return;
     }
-    remote function onPreReleased(github:ReleaseEvent payload) returns error? {
+    remote function onReviewRequestRemoved(github:PullRequestEvent payload) returns error? {
+        return;
+    }
+    remote function onLabeled(github:PullRequestEvent payload) returns error? {
+        return;
+    }
+    remote function onUnlabeled(github:PullRequestEvent payload) returns error? {
+        return;
+    }
+    remote function onEdited(github:PullRequestEvent payload) returns error? {
         return;
     }
 }
