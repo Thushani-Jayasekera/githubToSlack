@@ -3,6 +3,7 @@ import ballerina/log;
 import ballerinax/trigger.github;
 import ballerinax/slack;
 
+// new line
 // Github configuration parameters
 configurable github:ListenerConfig gitHubListenerConfig = ?;
 
