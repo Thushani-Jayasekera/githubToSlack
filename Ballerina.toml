@@ -1,0 +1,12 @@
+[build-options]
+  observabilityIncluded = true
+
+[package]
+  distribution = "2201.3.1"
+  export = ["github_release_to_slack"]
+  icon = "docs/icon.png"
+  keywords = ["Kind/Sample","Type/Webhook","Category/Integration","Internal/http"]
+  name = "github_release_to_slack"
+  org = "thushani"
+  version = "3.1.0"
+
